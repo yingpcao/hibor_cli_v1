@@ -1,7 +1,6 @@
 from pathlib import Path
 
 import pytest
-
 from hibor_cli import config as config_mod
 from hibor_cli.config import CONFIG_FILENAME, load_config, resolve_config_path, write_config
 from hibor_cli.models import ConfigError
@@ -42,12 +41,15 @@ class TestLoad:
         assert settings.headless is False and settings.max_consecutive_failures == 3
 
     def test_env_overrides_the_profile_dir_for_one_run(self, tmp_path):
-        settings = load_config(write(tmp_path, BASE), {"HIBOR_PROFILE_DIR": "D:/other/profile"})
-        assert settings.profile_dir == Path("D:/other/profile")
+        # 绝对路径要按运行平台取：POSIX 的 pathlib 不认盘符形式的路径，会当成相对段拼接
+        target = tmp_path / "other-profile"
+        settings = load_config(write(tmp_path, BASE), {"HIBOR_PROFILE_DIR": target.as_posix()})
+        assert settings.profile_dir == target
 
     def test_absolute_profile_dir_is_kept(self, tmp_path):
-        path = write(tmp_path, "profile_dir: D:/hibor/profile\n")
-        assert load_config(path, environ={}).profile_dir == Path("D:/hibor/profile")
+        target = tmp_path / "profile"
+        path = write(tmp_path, f"profile_dir: {target.as_posix()}\n")
+        assert load_config(path, environ={}).profile_dir == target
 
     def test_unknown_key_is_rejected_rather_than_ignored(self, tmp_path):
         with pytest.raises(ConfigError, match="jobs"):
@@ -116,11 +118,24 @@ class TestWriteConfig:
 
     def test_profile_dir_is_written_as_a_posix_path_and_reads_back(self, tmp_path):
         path = tmp_path / "config.yaml"
-        write_config(path, profile_dir="D:/HiborAgent/hibor-web/state/chrome-profile")
-        assert load_config(path, environ={}).profile_dir == Path("D:/HiborAgent/hibor-web/state/chrome-profile")
+        target = tmp_path / "hibor-web" / "state" / "chrome-profile"
+        write_config(path, profile_dir=target.as_posix())
+        assert f"profile_dir: \"{target.as_posix()}\"" in path.read_text(encoding="utf-8")
+        assert load_config(path, environ={}).profile_dir == target
 
     def test_refuses_to_overwrite_unless_forced(self, tmp_path):
         path = write_config(tmp_path / "config.yaml")
         with pytest.raises(ConfigError, match="--force"):
             write_config(path)
         assert write_config(path, force=True) == path
+
+
+def test_the_suite_has_no_windows_only_drive_literals():
+    """CI 也在 Linux 上跑：写死的盘符路径只被 Windows 的 pathlib 认成绝对路径，
+    在 POSIX 下会当相对段拼接，于是「Windows 绿、Linux 红」——这种断言等于只测了一半。"""
+    import re
+
+    pattern = re.compile(r"""["'][A-Za-z]:[/\\]""")
+    offenders = {p.name: [ln.strip() for ln in p.read_text(encoding="utf-8").splitlines()
+                          if pattern.search(ln)] for p in Path(__file__).parent.glob("test_*.py")}
+    assert {k: v for k, v in offenders.items() if v} == {}

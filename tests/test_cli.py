@@ -276,10 +276,11 @@ class TestSystemCli:
         assert "hibor login" in env["data"]["next"][0]
 
     def test_init_to_an_explicit_path(self, capsys, bare_environment, tmp_path):
+        target = tmp_path / "hibor" / "profile"    # 绝对路径按平台取，POSIX 的 pathlib 不认盘符形式
         code, env = call(capsys, "init", "--path", str(tmp_path / "cfg" / "config.yaml"),
-                         "--profile-dir", "D:/hibor/profile")
-        assert code == 0 and env["data"]["profile_dir"] == "D:/hibor/profile"
-        assert load_config(Path(env["data"]["config"]), environ={}).profile_dir == Path("D:/hibor/profile")
+                         "--profile-dir", target.as_posix())
+        assert code == 0 and Path(env["data"]["profile_dir"]) == target
+        assert load_config(Path(env["data"]["config"]), environ={}).profile_dir == target
 
     def test_second_init_refuses_to_clobber_and_suggests_force(self, capsys, bare_environment):
         call(capsys, "init")
