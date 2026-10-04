@@ -13,10 +13,13 @@
 推荐装成**系统级命令**（任意目录、任意终端里都能直接 `hibor …`，agent 也就能直接调）：
 
 ```powershell
-uv tool install C:\HiborAgent\hibor_cli_v1   # 或技能包里的 scripts\setup.ps1
+uv tool install --from git+https://github.com/yingpcao/hibor_cli_v1.git hibor-cli
 hibor init                                   # 写 ~/.hibor/config.yaml（可加 --profile-dir 复用已有登录）
 hibor --version                              # hibor 1.1.0
 ```
+
+装的是快照，改过代码要重装：`uv tool install --reinstall --from git+https://github.com/yingpcao/hibor_cli_v1.git hibor-cli`；
+在本地仓库里开发就把 `--from` 换成目录（`uv tool install --reinstall --from C:\HiborAgent\hibor_cli_v1 hibor-cli`）。
 
 `hibor init` 之后配置按 `--config` > `HIBOR_CONFIG` > `./config.yaml` > `~/.hibor/config.yaml` 找，
 所以平时无需再传路径；配置文件里的相对路径以**该文件所在目录**为基准。想接着用本仓库已有的工作区与
@@ -113,10 +116,11 @@ bash skills/hibor-reports/scripts/setup.sh --skill
 node skills/hibor-reports/scripts/setup.cjs --skill
 ```
 
-  脚本先确认 `hibor` 已在 PATH（没有就 `uv tool install --from <源码目录>`），`-Skill/--skill` 再把技能
+  脚本先确认 `hibor` 已在 PATH（没有就从本仓库装：`uv tool install --from <源码目录>`，或直接
+  `uv tool install --from git+https://github.com/yingpcao/hibor_cli_v1.git hibor-cli`），`-Skill/--skill` 再把技能
   目录复制到**已存在**的 `~/.claude`、`~/.codex`、`~/.pi/agent` 下（对应 Claude Code / Codex / 本运行环境）。
   Qoder 用项目级目录：把技能包复制到 `<项目>/.qoder/skills/hibor-reports`。
-  想走社区的 `npx skills add <owner>/<repo>/hibor-reports`，先把这个目录推到仓库 —— 内容与 westock 同构，无需改动。
+  技能包已随仓库发布，所以社区的 `npx skills add yingpcao/hibor_cli_v1/hibor-reports` 也能直接装。
 
 抓取范围参数（`list`/`fetch` 通用）：
 

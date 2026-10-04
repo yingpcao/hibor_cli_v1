@@ -11,14 +11,19 @@ no scheduling. User-facing docs, the exit-code table and the command reference l
 don't duplicate them here.
 
 It ships as a **system-level command**: `pyproject.toml` (hatchling, `[project.scripts] hibor =
-"hibor_cli.cli:main"`) → `uv tool install <this dir>` → `hibor` on PATH, so an agent can call it from
+"hibor_cli.cli:main"`) → `uv tool install --from git+https://github.com/yingpcao/hibor_cli_v1.git
+hibor-cli` (or `--from <this dir>` while developing) → `hibor` on PATH, so an agent can call it from
 any cwd. That is why config is found by *search* (`--config` > `HIBOR_CONFIG` > `./config.yaml` >
 `~/.hibor/config.yaml`) instead of relative to the package, and why `init`/`spec` must work with no
 config at all (`spec.CONFIGLESS_COMMANDS`). `hibor spec` is the machine-readable contract; the
 distributable agent skill lives in `skills/hibor-reports/` (westock-data's shape: `SKILL.md` +
 `references/` + `scripts/setup.{ps1,sh,cjs}`).
 
-Verification status (2026-10-04, after the packaging pass): suite green (272 tests) and the pieces that
+**This directory is git-ignored content that must never be committed**: `config.yaml` (live WeKnora
+key), `state/` (Chrome profile = the login, plus the dedup DB), `output/` (report excerpts). The
+public repo therefore carries `config.example.yaml` only; check `git status` before any publish.
+
+Verification status (2026-10-04, after the packaging pass): suite green (274 tests) and the pieces that
 touch the outside world were checked against the real thing, not just fixtures.
 - Noise gate: `stock list 紫金 --scope abstract --days 30` returns 50 hits, gates keep 7 / filter 43;
   `stock list 三七互娱 --days 90` (title scope) keeps all three `公司调研→财报点评→半年报点评` company

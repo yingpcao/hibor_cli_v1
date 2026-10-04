@@ -18,7 +18,8 @@ node scripts/setup.cjs --skill                                       # 跨平台
 ```
 
 安装脚本只做两件事：`uv tool install <源码目录>` 装出 `hibor`，以及 `-Skill` 把本目录复制到
-`~/.claude/skills/`、`~/.codex/skills/`。装好后：
+`~/.claude/skills/`、`~/.codex/skills/`。手上没有本仓库时直接按发布地址装：
+`uv tool install --from git+https://github.com/yingpcao/hibor_cli_v1.git hibor-cli`。装好后：
 
 ```powershell
 hibor init      # 写 ~/.hibor/config.yaml（可加 --profile-dir 复用已有的 Chrome 登录）

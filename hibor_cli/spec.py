@@ -195,7 +195,8 @@ CONVENTIONS = [
 
 SPEC = {
     "name": "hibor",
-    "install": "uv tool install hibor_cli_v1（或技能包里的 scripts/setup.ps1 / setup.sh）",
+    "install": "uv tool install --from git+https://github.com/yingpcao/hibor_cli_v1.git hibor-cli"
+               "（在仓库里开发就换成目录路径，或用技能包自带的 scripts/setup.ps1 / setup.sh）",
     "envelope": ENVELOPE,
     "config": CONFIG,
     "exit_codes": {
