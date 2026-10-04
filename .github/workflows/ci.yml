@@ -28,4 +28,17 @@ jobs:
       - name: Run the suite
         env:
           PYTHONIOENCODING: utf-8
-        run: python -m pytest -q --cov=hibor_cli --cov-report=term-missing
+        shell: bash
+        run: |
+          set +e
+          python -m pytest -q -rf --cov=hibor_cli --cov-report=term-missing 2>&1 | tee pytest.log
+          code=${PIPESTATUS[0]}
+          set -e
+          if [ "$code" -ne 0 ]; then
+            # 把失败条目提成 annotation：公开仓库不登录也能从 check run 读到，不必下载需要凭据的日志
+            grep -E '^(FAILED|ERROR)' pytest.log | head -20 | while IFS= read -r line; do
+              printf '::error::%s\n' "$line"
+            done
+            { echo '### pytest 末尾输出'; echo; echo '```'; tail -40 pytest.log; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+          fi
+          exit "$code"
