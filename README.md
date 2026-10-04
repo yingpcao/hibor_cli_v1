@@ -1,5 +1,8 @@
 # hibor_cli_v1 — 给 agent 用的慧博研报抓取 CLI
 
+[![tests](https://github.com/yingpcao/hibor_cli_v1/actions/workflows/ci.yml/badge.svg)](https://github.com/yingpcao/hibor_cli_v1/actions/workflows/ci.yml)
+[![MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
+
 一个独立的最小工具：用**你已登录的 Chrome**在慧博投研资讯（hibor.com.cn）上取研报，存成 Markdown，
 再推进 WeKnora 知识库。它由 `hibor-web` 精简而来，只保留两条检索路径：
 
@@ -229,4 +232,10 @@ hibor push --kb 新库名 --create --industry 有色金属
 - 不要为了绕过验证去改 cookie（尤其别删 `safedog-flow-item`），也不要导出 cookie 给别的客户端用 ——
   Chrome 配置目录本身就是会话。
 - 抓取内容仅供个人研究，请遵守网站用户协议。
+
+## 许可
+
+代码按 [MIT](LICENSE) 授权 —— 但这份授权只覆盖本仓库的代码，**不构成对 hibor.com.cn 的抓取授权**。
+目标站点的用户协议、`robots` 意图与上面那套节奏约定仍然由使用者自己承担；把 `delay` 调小、把 cookie
+导出给别的客户端这类用法，作者不建议。
 

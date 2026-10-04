@@ -1,0 +1,31 @@
+name: tests
+
+# 这套测试不联网、不开浏览器（session_factory 全部注入 fake），所以 CI 里不需要慧博登录态，
+# 也不该碰 state/ 与 output/ —— 那两个目录本来就在 .gitignore 里，CI 拿到的是空工作区。
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  pytest:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        python: ["3.11", "3.12"]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Install dependencies
+        run: uv pip install --system -r requirements-dev.txt
+      - name: Run the suite
+        env:
+          PYTHONIOENCODING: utf-8
+        run: python -m pytest -q --cov=hibor_cli --cov-report=term-missing
