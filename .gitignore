@@ -1,0 +1,11 @@
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.coverage
+state/
+output/
+logs/
+
+# 本地工作配置：里面有真实 WeKnora 密钥，共享出去就是泄密。新克隆用 config.example.yaml 复制一份。
+config.yaml
